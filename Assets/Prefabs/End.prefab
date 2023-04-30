@@ -44,5 +44,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1218f5aaee43d5405b28d5b818dde927, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Car: {fileID: 7834964939005959832, guid: 77914f5322a3cd6389bda7b0b3bab3d4, type: 3}
-  Interval: 6
+  Interval: 2

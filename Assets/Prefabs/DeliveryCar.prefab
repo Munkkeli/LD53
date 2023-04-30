@@ -218,6 +218,9 @@ MonoBehaviour:
     m_Bits: 1
   sprite: {fileID: 4034502602566813308}
   house: {fileID: 0}
+  _isAtTarget: 0
+  DeliveryLayer: 6
+  Label: {fileID: 6834326646674752700, guid: e28a7086fc0ea7be6a7bbc99ccab3b27, type: 3}
 --- !u!50 &1120301409277642798
 Rigidbody2D:
   serializedVersion: 4

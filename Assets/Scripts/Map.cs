@@ -75,9 +75,9 @@ public class Map : MonoBehaviour
     }
   }
 
-  private int _size;
-  private int _width;
-  private int _height;
+  public int _size;
+  public int _width;
+  public int _height;
   private Grid _grid;
   private Tilemap _tilemap;
   private TileBase[] tiles;
@@ -184,12 +184,15 @@ public class Map : MonoBehaviour
 
   public Vector3 MapToWorld(int x, int y) {
     var offset = new Vector2(_width, _height);
-    return (Vector2)_grid.GetCellCenterWorld(new Vector3Int(x, y)) - offset;
+    var center = (Vector2)_tilemap.cellBounds.center * 2f;
+    var position = (Vector2)_grid.GetCellCenterWorld(new Vector3Int(x, y)) - offset + center;
+    return position;
   }
   
   public Vector3 WorldToMap(Vector3 position) {
     var offset = new Vector3(_width, _height);
-    return _grid.WorldToCell(position + offset);
+    var center = _tilemap.cellBounds.center * 2f;
+    return _grid.WorldToCell(position + offset - center);
   }
 
   private TileBase? GetTile(int x, int y) {
@@ -207,8 +210,12 @@ public class Map : MonoBehaviour
     return _ends.ElementAt(_random.Next(_ends.Length));
   }
   
-  public House GetRandomHouse() {
-    return _houses.ElementAt(_random.Next(_houses.Length));
+  public House GetFarthestHouse(Vector2 position) {
+    return _houses.OrderBy(item => -Vector2.Distance(item.Position, position)).First();
+  }
+
+  public float GetDeliveriesPerEndAverage() {
+    return (float)_ends.Average(item => item.AmountOfDeliveriesSpawned);
   }
 
   public Road? GetRoadFromPosition(Vector3 position) {
@@ -221,8 +228,8 @@ public class Map : MonoBehaviour
   public void DeleteCar(Car car) {
     foreach (var road in _roads) {
       if (road != null) road.RemoveCar(car);
-      Destroy(car.gameObject);
     }
+    Destroy(car.gameObject);
   }
 
   public static Direction Vector2ToDirection(Vector2 direction) {

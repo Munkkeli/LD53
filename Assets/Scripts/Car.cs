@@ -21,6 +21,7 @@ public class Car : MonoBehaviour {
     protected Random _random = new Random();
 
     public Color[] colors;
+    protected Color? _color;
     
     public float Speed = 1f;
     public Transform Trigger;
@@ -28,7 +29,7 @@ public class Car : MonoBehaviour {
 
     public Transform sprite;
 
-    void Start() {
+    protected virtual void Start() {
         var road = Map.Current.GetRoadFromPosition(transform.position);
         if (road == null) {
             Destroy(gameObject);
@@ -45,9 +46,9 @@ public class Car : MonoBehaviour {
         CompleteMove();
         // _distance = 1f;
         _firstMove = true;
-
+        
         var sprite = GetComponentInChildren<SpriteRenderer>();
-        sprite.color = colors[_random.Next(colors.Length)];
+        sprite.color = _color ?? colors[_random.Next(colors.Length)];
     }
 
     protected virtual void Update() {

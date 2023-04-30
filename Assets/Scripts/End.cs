@@ -3,25 +3,32 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class End : MonoBehaviour {
-    public GameObject Car;
-
     public float Interval = 5f;
-
-    private float _timer;
+    public int AmountOfDeliveriesSpawned;
     
-    // Start is called before the first frame update
-    void Start() {
-        _timer = 0;
-    }
+    private float _timer;
 
-    // Update is called once per frame
-    void Update()
-    {
+    private void Update() {
         if (_timer <= 0) {
+            _timer = Interval + (Interval * Random.value);
+            
             var hit = Physics2D.OverlapBox(transform.position, new Vector2(1, 1), 0);
             if (hit) return;
-            Instantiate(Car, transform.position, Quaternion.identity);
-            _timer = Interval + (Interval * Random.value);
+
+            // Try to spawn deliveries into different ends each time
+            if (!Controller.Current._spawnQueue.TryPeek(out var carTypePeek)) return;
+            if (carTypePeek == Controller.CarType.Delivery &&
+                AmountOfDeliveriesSpawned > Map.Current.GetDeliveriesPerEndAverage()) {
+                return;
+            }
+
+            if (!Controller.Current._spawnQueue.TryDequeue(out var carType)) return;
+            
+            Instantiate(Controller.Current.CarTypeToPrefab[carType], transform.position, Quaternion.identity);
+
+            if (carType == Controller.CarType.Delivery) {
+                AmountOfDeliveriesSpawned++;
+            }
         }
 
         _timer -= Time.deltaTime;
