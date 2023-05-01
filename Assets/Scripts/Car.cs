@@ -19,6 +19,7 @@ public class Car : MonoBehaviour {
     protected float _distance = 0;
     protected Vector2 _target;
     protected Random _random = new Random();
+    private Vector3 _rotationVel;
 
     public Color[] colors;
     protected Color? _color;
@@ -55,10 +56,15 @@ public class Car : MonoBehaviour {
         _target = CalculateTarget();
         
         if (_canMove) _distance += Speed * Time.deltaTime;
-        (transform.position, transform.rotation) = (_direction == _lastDirection)
+        var (position, rotation) = (_direction == _lastDirection)
             ? LerpForward(_lastPosition, _target)
             : LerpCorner(_lastPosition, _target, _lastDirection);
+        
+        var smoothRotation = Quaternion.RotateTowards(transform.rotation, rotation, 200f * Time.deltaTime);
 
+        transform.position = position;
+        transform.rotation = smoothRotation;
+        
         if (_distance >= 1f) {
             if (!_nextRoad.CheckCarSpace(_direction)) return;
             var _nextDirection = (_nextNextRoad.Position - _nextRoad.Position).normalized;

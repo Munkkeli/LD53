@@ -3874,7 +3874,7 @@ MonoBehaviour:
   maximumSpawnRateInMinute: 25
   maximumDeliveryDelay: 17
   currentDeliveries: 0
-  targetDeliveries: 10
+  targetDeliveries: 13
 --- !u!4 &1286608012
 Transform:
   m_ObjectHideFlags: 0
