@@ -19,6 +19,7 @@ public class Controller : MonoBehaviour {
     public GameObject DeliveryCar;
     public GameState state = GameState.Start;
     public int stageIndex;
+    private float _time;
 
     private Button _startButton;
     private Button _goButton;
@@ -82,8 +83,10 @@ public class Controller : MonoBehaviour {
 
     private void LoadScene(string scene = null) {
         Debug.Log(Scenes[stageIndex]);
+        if (Config.Current) Config.Current.currentDeliveries = 0;
         Config.Current = null;
         _houseIndex = 0;
+        _time = 0;
         var loadScene = scene ?? Scenes[stageIndex];
         SceneManager.LoadScene(loadScene, LoadSceneMode.Single);
         state = GameState.Running;
@@ -91,8 +94,8 @@ public class Controller : MonoBehaviour {
     }
     
     private void Restart() {
+        if (Config.Current) Config.Current.currentDeliveries = 0;
         Config.Current = null;
-        Config.Current.currentDeliveries = 0;
         _houseIndex = 0;
         stageIndex = 0;
         state = GameState.Start;
@@ -118,13 +121,15 @@ public class Controller : MonoBehaviour {
         var config = Config.Current;
         if (!config) return;
 
+        _time += Time.deltaTime;
+
         if (_spawnTimer <= 0 && _spawnQueue.Count < 5) {
             _spawnQueue.Enqueue(_deliveryDelay <= 0 ? CarType.Delivery : CarType.AI);
             var maxDelay = 60f / config.maximumSpawnRateInMinute;
-            _spawnTimer = maxDelay - (config.spawnRateOverTime.Evaluate(Time.time / (60 * config.estimatedLevelDurationInMinutes)) * maxDelay);
+            _spawnTimer = maxDelay - (config.spawnRateOverTime.Evaluate(_time / (60 * config.estimatedLevelDurationInMinutes)) * maxDelay);
             if (_deliveryDelay <= 0) {
                 _deliveryDelay =
-                    config.maximumDeliveryDelay - (int)(config.deliverySpawnRateOverTime.Evaluate(Time.time / (60 * config.estimatedLevelDurationInMinutes)) * config.maximumDeliveryDelay);
+                    config.maximumDeliveryDelay - (int)(config.deliverySpawnRateOverTime.Evaluate(_time / (60 * config.estimatedLevelDurationInMinutes)) * config.maximumDeliveryDelay);
             }
             _deliveryDelay--;
         }
@@ -134,7 +139,7 @@ public class Controller : MonoBehaviour {
         goalText.text = $"{config.currentDeliveries} / {config.targetDeliveries}";
 
         if (config.currentDeliveries >= config.targetDeliveries) {
-            var isWin = stageIndex + 1 >= Scenes.Length;
+            var isWin = stageIndex >= Scenes.Length;
             state = isWin ? GameState.Win : GameState.Complete;
         }
     }

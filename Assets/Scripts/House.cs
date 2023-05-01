@@ -27,6 +27,9 @@ public class House : MonoBehaviour {
     private void Update() {
         var position = Camera.main.WorldToScreenPoint(Position);
         _label.position = new Vector2(position.x, position.y);
+        
+        var visible = Controller.Current.state == Controller.GameState.Running;
+        _label.gameObject.SetActive(visible);
     }
 
     private void OnDestroy() {

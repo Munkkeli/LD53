@@ -46,6 +46,11 @@ public class DeliveryCar : Car {
     var position = Camera.main.WorldToScreenPoint(transform.position);
     _label.position = new Vector2(position.x, position.y + 32f);
     
+    var mouse = Input.mousePosition;
+    var visible = Vector2.Distance(mouse, _label.position) > 100 &&
+                  Controller.Current.state == Controller.GameState.Running;
+    _label.gameObject.SetActive(visible);
+
     _label.GetComponentInChildren<Text>().text = house.letter;
     foreach (var image in _label.GetComponentsInChildren<Image>()) {
       if (image.gameObject.name != "color") continue;
